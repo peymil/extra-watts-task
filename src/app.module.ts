@@ -8,8 +8,8 @@ import { ConfigModule } from '@nestjs/config';
   imports: [
     ConfigModule.forRoot({ cache: true }),
     TypeOrmModule.forRoot({ autoLoadEntities: true }),
-    ContractModule,
     BlockchainModule,
+    ContractModule,
     UsdtLoggerModule,
   ],
 })

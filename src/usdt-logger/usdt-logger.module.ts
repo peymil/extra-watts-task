@@ -5,10 +5,7 @@ import { UsdtListener } from './usdt.listener';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [
-    ContractModule,
-    UsdtListener,
-    TypeOrmModule.forFeature([Transaction, Approval]),
-  ],
+  imports: [ContractModule, TypeOrmModule.forFeature([Transaction, Approval])],
+  providers: [UsdtListener],
 })
 export class UsdtLoggerModule {}
