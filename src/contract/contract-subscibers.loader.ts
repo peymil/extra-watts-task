@@ -8,6 +8,7 @@ import { DiscoveryService, MetadataScanner } from '@nestjs/core';
 import { InstanceWrapper } from '@nestjs/core/injector/instance-wrapper';
 import { ContractMetadataAccessor } from './contract-metadata.accessor';
 import { Contract } from 'ethers';
+import { removeAllListeners } from 'process';
 
 @Injectable()
 export class ContractSubscriberLoader
@@ -15,8 +16,10 @@ export class ContractSubscriberLoader
 {
   constructor(
     private readonly discoveryService: DiscoveryService,
-    @Inject('USDT_CONTRACT')
-    private readonly alchemyProvider: Contract,
+    @Inject('CONTRACTS_PROVIDER')
+    private readonly contractsProvider: {
+      [k: string]: Contract;
+    },
     private readonly metadataAccessor: ContractMetadataAccessor,
     private readonly metadataScanner: MetadataScanner,
   ) {}
@@ -26,7 +29,9 @@ export class ContractSubscriberLoader
   }
 
   onApplicationShutdown() {
-    this.alchemyProvider.removeAllListeners();
+    Object.values(this.contractsProvider).forEach((contract) =>
+      contract.removeAllListeners(),
+    );
   }
 
   loadEventListeners() {
@@ -42,8 +47,9 @@ export class ContractSubscriberLoader
         this.metadataScanner.scanFromPrototype(
           instance,
           prototype,
-          (methodKey: string) =>
-            this.subscribeToEventIfListener(instance, methodKey),
+          (methodKey: string) => {
+            return this.subscribeToEventIfListener(instance, methodKey);
+          },
         );
       });
   }
@@ -59,8 +65,8 @@ export class ContractSubscriberLoader
       return;
     }
     const { event } = eventListenerMetadata;
-    this.alchemyProvider.on(event, (...args: unknown[]) =>
-      instance[methodKey](...args),
-    );
+    const contract = this.contractsProvider[''];
+    if (!contract) return;
+    contract.on(event, (...args: unknown[]) => instance[methodKey](...args));
   }
 }
