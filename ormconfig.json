@@ -1,6 +1,8 @@
 {
-  "type": "sqlite",
-  "database": ".sqlite",
+  "type": "mongodb",
+  "host": "mongodb",
+  "port": "27017",
+  "database": "logs",
   "entities": ["dist/**/*.entity.js"],
   "synchronize": true
 }
