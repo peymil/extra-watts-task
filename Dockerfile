@@ -6,7 +6,8 @@ COPY package*.json ./
 
 RUN npm install --only=development
 
-COPY . .
+COPY src ./src
+COPY tsconfig* ./
 
 RUN npm run build
 
@@ -21,8 +22,8 @@ COPY package*.json ./
 
 RUN npm install --only=production
 
-COPY . .
-
 COPY --from=development /usr/src/app/dist ./dist
+
+COPY ormconfig.json ./
 
 CMD ["node", "dist/main"]
