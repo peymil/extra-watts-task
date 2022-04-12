@@ -1,6 +1,6 @@
 import { AlchemyProvider } from '@ethersproject/providers';
 import { Contract } from '@ethersproject/contracts';
-import USDT_ABI from 'src/ABI/USDT';
+import USDT_ABI from 'src/ABIS/USDT';
 
 export const contractProviders = [
   {
