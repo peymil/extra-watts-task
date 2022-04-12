@@ -1,12 +1,12 @@
-import { Controller } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BigNumber, Event } from 'ethers';
 import { on } from 'src/contract/decorators';
 import { Repository } from 'typeorm';
 import { Approval, Transaction } from './entities';
 import { InjectRepository } from '@nestjs/typeorm';
 
-@Controller('usdt-logger')
-export class UsdtLoggerController {
+@Injectable()
+export class UsdtListener {
   constructor(
     @InjectRepository(Approval)
     private approvalRepository: Repository<Approval>,
@@ -14,14 +14,7 @@ export class UsdtLoggerController {
     private transactionRepository: Repository<Transaction>,
   ) {}
   @on('Transfer')
-  logTransactions(
-    from: string,
-    to: string,
-    value: BigNumber,
-    eventData: Event,
-  ) {
-    console.log('eventData', eventData);
-
+  async transfer(from: string, to: string, value: BigNumber, eventData: Event) {
     const transaction = new Transaction();
     transaction.contract = eventData.address;
     transaction.from = from;
@@ -30,12 +23,7 @@ export class UsdtLoggerController {
     this.transactionRepository.insert(transaction);
   }
   @on('Approval')
-  logApproval(
-    owner: string,
-    spender: string,
-    value: BigNumber,
-    eventData: Event,
-  ) {
+  approval(owner: string, spender: string, value: BigNumber, eventData: Event) {
     const approval = new Approval();
     approval.contract = eventData.address;
     approval.owner = owner;
